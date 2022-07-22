@@ -3,7 +3,7 @@ import pathlib
 
 class Card:
     
-    def __init__(self, front, back):
+    def __init__(self, front, back) -> None:
         self.front = front
         self.back = back
 
@@ -12,31 +12,44 @@ class Card:
 
 class Deck:
 
-    def __init__(self, filename, isFrontCaseSensitive=False, isBackCaseSensitive=False) -> None:
-        self._cards = []
+    def __init__(self, filename = "", isFrontCaseSensitive=False, isBackCaseSensitive=False, isFixedDeck=False, deckName=None) -> None:
+        self._cards=[]
         self._isFrontCaseSensitive=isFrontCaseSensitive
         self._isBackCaseSensitive=isBackCaseSensitive
+        self.isFixedDeck=isFixedDeck
+        self.deckName=deckName
 
     def __len__(self):
         return len(self._cards)
 
-    def __getitem__(self, cardname):
-        
-        if not self._isFrontCaseSensitive:
-            cardname=cardname.lower()
-
-        return self[cardname]
+    def __getitem__(self, card):
+        return self._cards[card]
 
     def __contains__(self, card) -> bool:
-        front = card.front.lower() if card.front else self._isFrontCaseSensitive
+        front = card.front if self._isFrontCaseSensitive else card.front.lower()
         return front in self.CardNames
 
-    @lazy_property
+    def __repr__(self) -> str:
+        prefix= self.deckName if self.deckName is not None else "New Deck"
+        return prefix + "(" + str(len(self)) + " cards)"
+
+    @property
     def CardNames(self) -> list:
         return [repr(card) for card in self._cards]
 
-    def add(card):
-        if
+    def __add(self, card):
+        if not card in self:
+            self._cards.append(card)
+            self._updatesProperties=True
+            return True
+        else:
+            return False
+
+    def tryadd(self, card):
+        if self.isFixedDeck:
+            return False
+            
+        return self.__add(self, card)
     
     def read(path, skipsHeader=False, infoCallback=None):
         skipCount=0
