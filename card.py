@@ -1,5 +1,6 @@
 from lazyproperty import lazy_property
 import pathlib
+import re
 
 class Card:
     
@@ -13,11 +14,11 @@ class Card:
 class Deck:
 
     def __init__(self, filename = "", isFrontCaseSensitive=False, isBackCaseSensitive=False, isFixedDeck=False, deckName=None) -> None:
-        self._cards=[]
+        self._cards={}
         self._isFrontCaseSensitive=isFrontCaseSensitive
         self._isBackCaseSensitive=isBackCaseSensitive
-        self.isFixedDeck=isFixedDeck
-        self.deckName=deckName
+        self._isFixedDeck=isFixedDeck
+        self._deckName=deckName
 
     def __len__(self):
         return len(self._cards)
@@ -30,33 +31,45 @@ class Deck:
         return front in self.CardNames
 
     def __repr__(self) -> str:
-        prefix= self.deckName if self.deckName is not None else "New Deck"
-        return prefix + "(" + str(len(self)) + " cards)"
+        prefix= self._deckName if self._deckName is not None else "New Deck"
+        length=len(self)
+        return prefix + " (" + str(length) + (" cards)" if length != 1 else " card)")
 
     @property
     def CardNames(self) -> list:
         return [repr(card) for card in self._cards]
 
+    @property
+    def IsFixedDeck(self) -> bool:
+        return self._isFixedDeck
+
     def __add(self, card):
         if not card in self:
-            self._cards.append(card)
-            self._updatesProperties=True
+            self._cards[repr(card)]=card
             return True
         else:
             return False
 
     def tryadd(self, card):
-        if self.isFixedDeck:
+        if self._isFixedDeck:
             return False
             
-        return self.__add(self, card)
+        return self.__add(card)
     
-    def read(path, skipsHeader=False, infoCallback=None):
+    def read(self, path, skipsHeader=False, infoCallback=None):
         skipCount=0
         splitstring=";\t"
         text = pathlib.Path(path).read_text()
-        front_back_pairs=text.split(splitstring)
+        front_back_pairs=text.split("\n")
+
+        if skipsHeader:
+            front_back_pairs.pop(0)
+
+        #TODO her satiri regex check yaptir!!!
 
         for fbp in front_back_pairs:
             fbp = fbp.split(splitstring)
+            card = Card(fbp[0], fbp[1])
+            if not self.__add(card):
+                skipCount +=1
 
