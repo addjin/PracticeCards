@@ -2,6 +2,8 @@ from lazyproperty import lazy_property
 import pathlib
 import re
 
+fbpRegex = re.compile(r'(\w+);\t(.+)')
+
 class Card:
     
     def __init__(self, front, back) -> None:
@@ -59,7 +61,6 @@ class Deck:
     def read(self, path, skipsHeader=False, infoCallback=None):
         skipCount=0
         splitstring=";\t"
-        fbpRegex = re.compile(r'(\w+);\t(.+)')
         text = pathlib.Path(path).read_text()
         front_back_pairs=text.split("\n")
 
