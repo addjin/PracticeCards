@@ -21,4 +21,8 @@ print(card1)
 japDeck = Deck(deckName="Japanese Deck")
 japDeck.read("D:\Projects\Scripts_Codes\Jap_vocab\sample", skipsHeader=True)
 
+incompleteDeck = Deck(deckName="Incomplete deck")
+incompleteDeck.read("D:\Projects\Scripts_Codes\Jap_vocab\sample2", skipsHeader=True)
+
 japDeck
+incompleteDeck

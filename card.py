@@ -59,17 +59,19 @@ class Deck:
     def read(self, path, skipsHeader=False, infoCallback=None):
         skipCount=0
         splitstring=";\t"
+        fbpRegex = re.compile(r'(\w+);\t(.+)')
         text = pathlib.Path(path).read_text()
         front_back_pairs=text.split("\n")
 
         if skipsHeader:
             front_back_pairs.pop(0)
 
-        #TODO her satiri regex check yaptir!!!
-
         for fbp in front_back_pairs:
-            fbp = fbp.split(splitstring)
-            card = Card(fbp[0], fbp[1])
+            fbpSearch = fbpRegex.search(fbp)
+            if fbpSearch is None or len(fbpSearch.groups()) != 2:
+                skipCount +=1
+                continue
+            card = Card(fbpSearch[1], fbpSearch[2])
             if not self.__add(card):
                 skipCount +=1
 
