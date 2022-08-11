@@ -1,14 +1,18 @@
 import asyncio
+from card import Deck
 from ast import Pass
+import time
+import os
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, filedialog
 from utilities import *
 
 testtext = "sdf\ns\nd\nf\ns\nd\nf\ns\nd\nfsdf\ns\nd\nf\ns\nd\nf\ns\nd\nfsdf\ns\nd\nf\ns\nd\nf\ns\nd\nfsdf\ns\nd\nf\ns\nd\nf\ns\nd\nf"
 
 
-class Window(tk.Tk):
+class MainWindow(tk.Tk):
     def __init__(self):
+        self.loop = asyncio.get_event_loop()
         self.root = tk.Tk()
         self.root.title("Practice Cards")
         self.root.geometry("500x400")
@@ -25,12 +29,15 @@ class Window(tk.Tk):
 
         self.app_title_label = tk.Label(
             self.root, text="Practice Cards", font=("Helvetica", 15))
-        self.app_title_label.grid(row=0, column=0, columnspan=4, pady=10, sticky= tk.W)
+        self.app_title_label.grid(
+            row=0, column=0, columnspan=4, pady=10, sticky=tk.W)
 
-        self.load_button = tk.Button(self.root, text="Load", width=10)
+        self.load_button = tk.Button(
+            self.root, text="Load", width=10, command=self.loadbutton_click)
         self.load_button.grid(row=1, column=0, padx=3, sticky=tk.NW, pady=0)
 
-        self.start_button = tk.Button(self.root, text="Start", width=10)
+        self.start_button = tk.Button(
+            self.root, text="Start", width=10, command=self.startbutton_click)
         self.start_button.grid(row=2, column=0, padx=3, sticky=tk.NW, pady=1)
 
         self.deck_listbox = tk.Listbox(self.root)
@@ -42,7 +49,7 @@ class Window(tk.Tk):
             row=1, column=4, rowspan=5, sticky=tk.NS, pady=1)
         # self.deck_listbox_scrollbar['yscrollcommand'] = self.deck_listbox.yview_scroll
 
-        self.infotextbox = tk.Text(self.root)
+        self.infotextbox = tk.Text(self.root, state='disabled')
         # self.infotextbox.insert("0.2", testtext)
         self.infotextbox.grid(
             row=6, column=0, sticky=tk.EW, rowspan=4, columnspan=2, padx=1, pady=3)
@@ -55,14 +62,27 @@ class Window(tk.Tk):
         self.__append_to_infotextbox("Program started.")
 
     def __append_to_infotextbox(self, message):
+        self.infotextbox['state'] = 'normal'
         timestamp = "[" + get_time() + "] "
         message = timestamp + message + "\n"
         self.infotextbox.insert("0.0", message)
+        self.infotextbox['state'] = 'disabled'
 
-    
+    def loadbutton_click(self):
+        file = filedialog.askopenfilenames()
+        print(type(file))
+        if file == "":
+            self.__append_to_infotextbox("Deck loading cancelled.")
+            return False
+        else:
+            deck = Deck(file, isFixedDeck=True, deckName="TestDeck")
+        pass
+
+    def startbutton_click(self):
+        self.root.withdraw()
+        print("Test")
 
 
-
-window = Window()
+window = MainWindow()
 
 window.root.mainloop()
