@@ -1,3 +1,4 @@
+from unittest import skip
 from lazyproperty import lazy_property
 import pathlib
 import re
@@ -21,6 +22,8 @@ class Deck:
         self._isBackCaseSensitive=isBackCaseSensitive
         self._isFixedDeck=isFixedDeck
         self._deckName=deckName
+        if filename != "":
+            self.read(filename)
 
     def __len__(self):
         return len(self._cards)
@@ -45,6 +48,10 @@ class Deck:
     def IsFixedDeck(self) -> bool:
         return self._isFixedDeck
 
+    @property
+    def DeckName(self) -> str:
+        return self._deckName
+
     def __add(self, card):
         if not card in self:
             self._cards[repr(card)]=card
@@ -68,11 +75,27 @@ class Deck:
             front_back_pairs.pop(0)
 
         for fbp in front_back_pairs:
+            if fbp == "": 
+                continue
             fbpSearch = fbpRegex.search(fbp)
             if fbpSearch is None or len(fbpSearch.groups()) != 2:
                 skipCount +=1
                 continue
+
             card = Card(fbpSearch[1], fbpSearch[2])
             if not self.__add(card):
                 skipCount +=1
+
+        if len(self) > 0:
+            if infoCallback is not None:
+                message = f"\"{self._deckName}\" loaded. Deck size: {len(self)} cards"
+                if skipCount != 0:
+                    message += f", Skipped {skipCount} cards"
+                message += "."
+                infoCallback(message)
+            return True
+        else:
+            if infoCallback is not None:
+                infoCallback(f"No valid cards in the deck.")
+            return False
 
