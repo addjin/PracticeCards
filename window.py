@@ -1,13 +1,17 @@
 import asyncio
+from fileinput import filename
 from card import Deck
 from ast import Pass
 import time
 import os
+import pathlib
 import tkinter as tk
 from tkinter import ttk, filedialog
 from utilities import *
 
 testtext = "sdf\ns\nd\nf\ns\nd\nf\ns\nd\nfsdf\ns\nd\nf\ns\nd\nf\ns\nd\nfsdf\ns\nd\nf\ns\nd\nf\ns\nd\nfsdf\ns\nd\nf\ns\nd\nf\ns\nd\nf"
+
+decks = {}
 
 
 class MainWindow(tk.Tk):
@@ -69,14 +73,23 @@ class MainWindow(tk.Tk):
         self.infotextbox['state'] = 'disabled'
 
     def loadbutton_click(self):
-        file = filedialog.askopenfilenames()
-        print(type(file))
-        if file == "":
+        files = filedialog.askopenfilenames()
+        if files == "":
             self.__append_to_infotextbox("Deck loading cancelled.")
             return False
         else:
-            deck = Deck(file, isFixedDeck=True, deckName="TestDeck")
-        pass
+            for file in files:
+                deckname = os.path.basename(file)
+                if deckname in decks:
+                    deckname
+                newdeck = Deck(deckName=deckname)
+                if newdeck.read(file, infoCallback=self.__append_to_infotextbox):
+                    if deckname in decks:
+                        decks[deckname] = newdeck
+                        self.__append_to_infotextbox(f"\"{newdeck.DeckName}\" added to deck list.")
+                pass
+
+        print(files)
 
     def startbutton_click(self):
         self.root.withdraw()
