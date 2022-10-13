@@ -5,6 +5,7 @@ A project to practice vocabulary.
 """
 
 from card import Card, Deck
+import window
 
 card1 = Card("on yuz", "arka yuz")
 card2 = Card("表", "裏")
@@ -24,5 +25,12 @@ japDeck.read("D:\Projects\Scripts_Codes\Jap_vocab\sample", skipsHeader=True)
 incompleteDeck = Deck(deckName="Incomplete deck")
 incompleteDeck.read("D:\Projects\Scripts_Codes\Jap_vocab\sample2", skipsHeader=True)
 
-japDeck
+
+
+window = window.MainWindow()
+
+window.root.mainloop()
+
+
+print(japDeck)
 incompleteDeck

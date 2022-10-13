@@ -6,7 +6,7 @@ import time
 import os
 import pathlib
 import tkinter as tk
-from tkinter import ttk, filedialog
+from tkinter import Toplevel, ttk, filedialog
 from utilities import *
 
 testtext = "sdf\ns\nd\nf\ns\nd\nf\ns\nd\nfsdf\ns\nd\nf\ns\nd\nf\ns\nd\nfsdf\ns\nd\nf\ns\nd\nf\ns\nd\nfsdf\ns\nd\nf\ns\nd\nf\ns\nd\nf"
@@ -40,9 +40,13 @@ class MainWindow(tk.Tk):
             self.root, text="Load", width=10, command=self.loadbutton_click)
         self.load_button.grid(row=1, column=0, padx=3, sticky=tk.NW, pady=0)
 
-        self.start_button = tk.Button(
-            self.root, text="Start", width=10, command=self.startbutton_click)
-        self.start_button.grid(row=2, column=0, padx=3, sticky=tk.NW, pady=1)
+        self.practice_button = tk.Button(
+            self.root, text="Start", width=10, command=self.practicebutton_click)
+        self.practice_button.grid(row=2, column=0, padx=3, sticky=tk.NW, pady=1)
+
+        self.delete_button = tk.Button(
+            self.root, text="Delete", width=10, command=self.deletebutton_click)
+        self.delete_button.grid(row=3, column=0, padx=3, sticky=tk.NW, pady=2)
 
         self.deck_listbox = tk.Listbox(self.root)
         self.deck_listbox.grid(row=1, column=1, rowspan=5, columnspan=2,
@@ -84,18 +88,46 @@ class MainWindow(tk.Tk):
                     deckname
                 newdeck = Deck(deckName=deckname)
                 if newdeck.read(file, infoCallback=self.__append_to_infotextbox):
-                    if deckname in decks:
+                    if deckname not in decks:
                         decks[deckname] = newdeck
-                        self.__append_to_infotextbox(f"\"{newdeck.DeckName}\" added to deck list.")
-                pass
+                        self.__append_to_infotextbox(
+                            f"\"{deckname}\" added to deck list.")
+                        self.deck_listbox.insert(tk.END, deckname)
+                    else:
+                        self.__append_to_infotextbox(
+                            f"\"{deckname}\" is already added to the deck list.")
+                        return False
+                return True
 
-        print(files)
+        # print(files)
 
-    def startbutton_click(self):
+    def deletebutton_click(self):
+        if self.deck_listbox.size() == 0:
+            self.__append_to_infotextbox("The deck list is empty.")
+            return False
+
+        for item in self.deck_listbox.curselection():
+            deckname= self.deck_listbox.get(item)
+            self.deck_listbox.delete(item)
+            self.__append_to_infotextbox(f"\"{deckname}\" deleted from deck list.")
+        return True
+
+    def practicebutton_click(self):
+        if self.deck_listbox.size() == 0:
+            self.__append_to_infotextbox("The deck list box is empty.")
+            return False
+        
+
         self.root.withdraw()
-        print("Test")
+        practiceWindow = Toplevel()
+        practiceWindow.title("Practice (No Quiz)")
+
+        def practiceWindow_on_closing():
+            practiceWindow.destroy()
+            self.root.deiconify()
 
 
-window = MainWindow()
+        practiceWindow.protocol("WM_DELETE_WINDOW", practiceWindow_on_closing)
 
-window.root.mainloop()
+
+        # self.root.wm_deiconify()
